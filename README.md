@@ -231,6 +231,6 @@ df.head()
 ## Method 5: How to Use LangChain for Web Scraping
 I'm sure most of you reading this are familiar with tools like ChatGPT and BARD. Large Language Models (LLMs) simplify many tasks. Whether you're asking "Who is Donald Trump?" or requesting a translation from German to English, they provide quick answers. But did you know you can also use them for web scraping? Here's how.
 👉Here are some useful LangChain resources for this demo:
-* [https://python.langchain.com/docs/integrations/document_transformers/beautiful_soup](LangChain Beautiful Soup)
-* [https://python.langchain.com/v0.1/docs/use_cases/extraction/](LangChain Extraction)
+* [https://python.langchain.com/docs/integrations/document_transformers/beautiful_soup] (LangChain Beautiful Soup)
+* [https://python.langchain.com/v0.1/docs/use_cases/extraction/] (LangChain Extraction)
 
