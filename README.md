@@ -38,7 +38,61 @@ df = pd.DataFrame(movies_data, columns=['Title', 'Genre', 'Stars', 'Runtime', 'R
 # Display the resulting DataFrame
 df
 ```
-In each web scraping approach, I save the HTML to an imdb.txt file for a clearer view of the specific HTML elements being targeted.
-![image](https://github.com/user-attachments/assets/6c169635-e68f-430b-b042-53860192111d)
-Final Output:
-![image](https://github.com/user-attachments/assets/13b0e193-668b-4209-9a22-a0dcbe149049)
+
+## Method 2: ScraPy for Web Scraping
+Scrapy is a robust and versatile web scraping framework. The following code snippet demonstrates how to use *ScraPy*, with explanations provided in the comments.
+
+```
+# Import necessary libraries
+import scrapy
+from scrapy.crawler import CrawlerProcess
+
+# Define the Spider class for IMDb data extraction
+class IMDbSpider(scrapy.Spider):
+    # Name of the spider
+    name = "imdb_spider"
+    # Starting URL(s) for the spider to crawl
+    start_urls = ["https://www.imdb.com/list/ls566941243/"]
+    # start_urls = [url]
+
+    # Parse method to extract data from the webpage
+    def parse(self, response):
+        # Iterate over each movie item on the webpage
+        for movie in response.css('div.lister-item-content'):
+            yield {
+                'title': movie.css('h3.lister-item-header a::text').get(),
+                'genre': movie.css('p.text-muted span.genre::text').get(),
+                'runtime': movie.css('p.text-muted span.runtime::text').get(),
+                'rating': movie.css('div.ipl-rating-star span.ipl-rating-star__rating::text').get(),
+            }
+# Initialize a CrawlerProcess instance with settings
+process = CrawlerProcess(settings={
+    'FEED_FORMAT': 'json',
+    'FEED_URI': 'output.json',  # This will overwrite the file every time you run the spider
+})
+
+
+# Add the IMDbSpider to the crawling process
+process.crawl(IMDbSpider)
+# Start the crawling process
+process.start()
+```
+```
+import pandas as pd
+
+# Read the output.json file into a DataFrame (jsonlines format)
+df = pd.read_json('output.json')
+
+# Display the DataFrame
+df.head()
+```
+Present the data in a dataframe:
+```
+import pandas as pd
+
+# Read the output.json file into a DataFrame (jsonlines format)
+df = pd.read_json('output.json')
+
+# Display the DataFrame
+df.head()
+```
