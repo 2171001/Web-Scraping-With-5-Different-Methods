@@ -96,3 +96,141 @@ df = pd.read_json('output.json')
 # Display the DataFrame
 df.head()
 ```
+
+## Method 3: Selenium for Web Scraping
+Selenium is commonly utilized for scraping dynamic websites. Below is a simple example:
+```
+from selenium import webdriver
+from bs4 import BeautifulSoup
+import pandas as pd
+
+# URL of the IMDb list
+url = "https://www.imdb.com/list/ls566941243/"
+
+# Set up Chrome options to run the browser in incognito mode
+chrome_options = webdriver.ChromeOptions()
+chrome_options.add_argument("--incognito")
+
+# Initialize the Chrome driver with the specified options
+driver = webdriver.Chrome(options=chrome_options)
+
+# Navigate to the IMDb list URL
+driver.get(url)
+
+# Wait for the page to load (adjust the wait time according to your webpage)
+driver.implicitly_wait(10)
+
+# Get the HTML content of the page after it has fully loaded
+html_content = driver.page_source
+
+# Parse the HTML content with BeautifulSoup
+soup = BeautifulSoup(html_content, 'html.parser')
+
+# Save the HTML content to a text file for reference
+with open("imdb_selenium.txt", "w", encoding="utf-8") as file:
+    file.write(str(soup))
+print("Page content has been saved to imdb_selenium.txt")
+
+# Extract movie data from the parsed HTML
+movies_data = []
+for movie in soup.find_all('div', class_='lister-item-content'):
+    title = movie.find('a').text
+    genre = movie.find('span', class_='genre').text.strip()
+    stars = movie.select_one('div.ipl-rating-star span.ipl-rating-star__rating').text
+    runtime = movie.find('span', class_='runtime').text
+    rating = movie.select_one('div.ipl-rating-star span.ipl-rating-star__rating').text
+    movies_data.append([title, genre, stars, runtime, rating])
+
+# Create a Pandas DataFrame from the collected movie data
+df = pd.DataFrame(movies_data, columns=['Title', 'Genre', 'Stars', 'Runtime', 'Rating'])
+
+# Display the resulting DataFrame
+print(df)
+
+# Close the Chrome driver
+driver.quit()
+```
+The key to using Selenium effectively lies in Chrome options, which allow you to customize the behavior of the Chrome browser when it's controlled by Selenium WebDriver. These settings let you manage features like incognito mode, window size, notifications, and more.
+
+Below are some essential Chrome options you may find helpful:
+```
+# Runs the browser in incognito (private browsing) mode.
+chrome_options.add_argument("--incognito")
+
+# Runs the browser in headless mode, i.e., without a graphical user interface. 
+# Useful for running Selenium tests in the background without opening a visible browser window.
+chrome_options.add_argument("--headless")
+
+# Sets the initial window size of the browser.
+chrome_options.add_argument("--window-size=1200x600")
+
+# Disables browser notifications.
+chrome_options.add_argument("--disable-notifications")
+
+# Disables the infobar that appears at the top of the browser.
+chrome_options.add_argument("--disable-infobars")
+
+# Disables browser extensions.
+chrome_options.add_argument("--disable-extensions")
+
+# Disables the GPU hardware acceleration.
+chrome_options.add_argument("--disable-gpu")
+
+# Disables web security features, which can be useful for testing on localhost without CORS issues.
+chrome_options.add_argument("--disable-web-security")
+```
+You can use these options individually or in combination, depending on your needs. When initializing a **webdriver.Chrome** instance, pass these options through the **options** parameter:
+```
+from selenium import webdriver
+
+chrome_options = webdriver.ChromeOptions()
+chrome_options.add_argument("--incognito")
+chrome_options.add_argument("--headless")
+
+driver = webdriver.Chrome(options=chrome_options)
+```
+These options offer flexibility and control over the browser's behavior when using Selenium for web automation or testing. Select the options that best suit your specific use case and needs.
+
+## Method 4: Requests and lxml for Web Scraping
+lxml is a Python library that integrates with the C libraries libxml2 and libxslt, offering the speed and functionality of XML with a straightforward native Python API. It is similar to ElementTree but provides additional advantages.
+```
+import requests
+from lxml import html
+import pandas as pd
+
+# Define the URL
+url = "https://www.imdb.com/list/ls566941243/"
+
+# Send an HTTP request to the URL and get the response
+response = requests.get(url)
+
+# Parse the HTML content using lxml
+tree = html.fromstring(response.content)
+
+# Extract movie data from the parsed HTML
+titles = tree.xpath('//h3[@class="lister-item-header"]/a/text()')
+genres = [', '.join(genre.strip() for genre in genre_list.xpath(".//text()")) for genre_list in tree.xpath('//p[@class="text-muted text-small"]/span[@class="genre"]')]
+ratings = tree.xpath('//div[@class="ipl-rating-star small"]/span[@class="ipl-rating-star__rating"]/text()')
+runtimes = tree.xpath('//p[@class="text-muted text-small"]/span[@class="runtime"]/text()')
+
+# Create a dictionary with extracted data
+data = {
+    'Title': titles,
+    'Genre': genres,
+    'Rating': ratings,
+    'Runtime': runtimes
+}
+
+# Create a DataFrame from the dictionary
+df = pd.DataFrame(data)
+
+# Display the resulting DataFrame
+df.head()
+```
+
+## Method 5: How to Use LangChain for Web Scraping
+I'm sure most of you reading this are familiar with tools like ChatGPT and BARD. Large Language Models (LLMs) simplify many tasks. Whether you're asking "Who is Donald Trump?" or requesting a translation from German to English, they provide quick answers. But did you know you can also use them for web scraping? Here's how.
+👉Here are some useful LangChain resources for this demo:
+* [https://python.langchain.com/docs/integrations/document_transformers/beautiful_soup](LangChain Beautiful Soup)
+* [https://python.langchain.com/v0.1/docs/use_cases/extraction/](LangChain Extraction)
+
