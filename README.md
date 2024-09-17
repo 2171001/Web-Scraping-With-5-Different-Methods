@@ -249,7 +249,9 @@ MY_OPENAI_KEY = os.getenv("MY_OPENAI_KEY")
 MY_COMET_KEY = os.getenv("MY_COMET_KEY")
 ```
 For my LLM project, I typically log outputs in a Comet project. In this demo, I’m only using one URL, but if you need to process multiple URLs, Comet LLM’s experiment tracking feature is incredibly helpful.
+
 👉 Read more about [Comet LLM](https://www.comet.com/site/products/opik/).
+
 👉 How to obtain the API keys: [OpenAI Help Center — Where can I find my API key?;](https://help.openai.com/en/articles/4936850-where-do-i-find-my-openai-api-key) [CometLLM — Obtaining your API key](https://www.comet.com/docs/v2/api-and-sdk/rest-api/overview/)
 ```
 import comet_llm
