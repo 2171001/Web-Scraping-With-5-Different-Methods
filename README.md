@@ -1,7 +1,7 @@
 # Web-Scraping-With-5-Different-Methods: Including-Using-LLMs
 Web scraping involves automating the process of extracting data from websites using programming or dedicated tools. It’s essential for tasks like market research, data analysis, content aggregation, and competitive intelligence. This method is efficient, saving time and enhancing decision-making by enabling businesses to analyze trends and patterns, making it a powerful way to gather valuable information from the web.
 
-I’m eager to explore this topic, which captivates many. Apart from *BeautifulSoup, Scrapy, and Selenium*, have you thought about using LLMs for web scraping? It’s a fascinating approach that deserves your attention.
+I’m eager to explore this topic, which captivates many. Apart from ***BeautifulSoup, Scrapy, and Selenium***, have you thought about using LLMs for web scraping? It’s a fascinating approach that deserves your attention.
 
 ## Method 1: BeautifulSoup and Requests for Web Scraping
 The first approach utilizes the widely-used *BeautifulSoup* and *Requests* libraries. These tools simplify the process of parsing HTML and navigating the structure of web pages. Here's an example Python code snippet.
@@ -231,6 +231,6 @@ df.head()
 ## Method 5: How to Use LangChain for Web Scraping
 I'm sure most of you reading this are familiar with tools like ChatGPT and BARD. Large Language Models (LLMs) simplify many tasks. Whether you're asking "Who is Donald Trump?" or requesting a translation from German to English, they provide quick answers. But did you know you can also use them for web scraping? Here's how.
 👉Here are some useful LangChain resources for this demo:
-* [https://python.langchain.com/docs/integrations/document_transformers/beautiful_soup] (LangChain Beautiful Soup)
-* [https://python.langchain.com/v0.1/docs/use_cases/extraction/] (LangChain Extraction)
+* [LangChain Beautiful Soup](https://python.langchain.com/docs/integrations/document_transformers/beautiful_soup)
+* [LangChain Extraction](https://python.langchain.com/v0.1/docs/use_cases/extraction)
 
