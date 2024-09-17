@@ -38,3 +38,7 @@ df = pd.DataFrame(movies_data, columns=['Title', 'Genre', 'Stars', 'Runtime', 'R
 # Display the resulting DataFrame
 df
 ```
+In each web scraping approach, I save the HTML to an imdb.txt file for a clearer view of the specific HTML elements being targeted.
+![image](https://github.com/user-attachments/assets/6c169635-e68f-430b-b042-53860192111d)
+Final Output:
+![image](https://github.com/user-attachments/assets/13b0e193-668b-4209-9a22-a0dcbe149049)
