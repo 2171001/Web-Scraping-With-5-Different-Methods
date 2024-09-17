@@ -4,7 +4,7 @@ Web scraping involves automating the process of extracting data from websites us
 I’m eager to explore this topic, which captivates many. Apart from ***BeautifulSoup, Scrapy, and Selenium***, have you thought about using LLMs for web scraping? It’s a fascinating approach that deserves your attention.
 
 ## Method 1: BeautifulSoup and Requests for Web Scraping
-The first approach utilizes the widely-used *BeautifulSoup* and *Requests* libraries. These tools simplify the process of parsing HTML and navigating the structure of web pages. Here's an example Python code snippet.
+The first approach utilizes the widely-used ***BeautifulSoup*** and ***Requests*** libraries. These tools simplify the process of parsing HTML and navigating the structure of web pages. Here's an example Python code snippet.
 
 ```
 import requests
@@ -230,7 +230,119 @@ df.head()
 
 ## Method 5: How to Use LangChain for Web Scraping
 I'm sure most of you reading this are familiar with tools like ChatGPT and BARD. Large Language Models (LLMs) simplify many tasks. Whether you're asking "Who is Donald Trump?" or requesting a translation from German to English, they provide quick answers. But did you know you can also use them for web scraping? Here's how.
+
 👉Here are some useful LangChain resources for this demo:
 * [LangChain Beautiful Soup](https://python.langchain.com/docs/integrations/document_transformers/beautiful_soup)
 * [LangChain Extraction](https://python.langchain.com/v0.1/docs/use_cases/extraction)
 
+Each code line is briefly explained in the comments.
+```
+import os
+import dotenv
+import time
+
+# Load environment variables from a .env file
+dotenv.load_dotenv()
+
+# Retrieve OpenAI and Comet key from environment variables
+MY_OPENAI_KEY = os.getenv("MY_OPENAI_KEY")
+MY_COMET_KEY = os.getenv("MY_COMET_KEY")
+```
+For my LLM project, I typically log outputs in a Comet project. In this demo, I’m only using one URL, but if you need to process multiple URLs, Comet LLM’s experiment tracking feature is incredibly helpful.
+👉 Read more about [Comet LLM](https://www.comet.com/site/products/opik/).
+👉 How to obtain the API keys: [OpenAI Help Center — Where can I find my API key?;](https://help.openai.com/en/articles/4936850-where-do-i-find-my-openai-api-key) [CometLLM — Obtaining your API key](https://www.comet.com/docs/v2/api-and-sdk/rest-api/overview/)
+```
+import comet_llm
+
+# Initialize a Comet project
+comet_llm.init(project="langchain-web-scraping",
+               api_key=MY_COMET_KEY,
+               )
+```
+```
+# Resolve async issues by applying nest_asyncio
+import nest_asyncio
+nest_asyncio.apply()
+
+# Import required modules from langchain
+from langchain_openai import ChatOpenAI
+from langchain_community.document_loaders import AsyncChromiumLoader
+from langchain_community.document_transformers import BeautifulSoupTransformer
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain.chains import create_extraction_chain
+
+# Define the URL
+url = "https://www.imdb.com/list/ls566941243/"
+
+# Initialize ChatOpenAI instance with OpenAI API key
+llm = ChatOpenAI(openai_api_key=MY_OPENAI_KEY)
+
+# Load HTML content using AsyncChromiumLoader
+loader = AsyncChromiumLoader([url])
+docs = loader.load()
+
+# Save the HTML content to a text file for reference
+with open("imdb_langchain_html.txt", "w", encoding="utf-8") as file:
+    file.write(str(docs[0].page_content))
+print("Page content has been saved to imdb_langchain_html.txt")
+
+# Transform the loaded HTML using BeautifulSoupTransformer
+bs_transformer = BeautifulSoupTransformer()
+docs_transformed = bs_transformer.transform_documents(
+    docs, tags_to_extract=["h3", "p"]
+)
+
+# Split the transformed documents using RecursiveCharacterTextSplitter
+splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(chunk_size=1000, chunk_overlap=0)
+splits = splitter.split_documents(docs_transformed)
+```
+After getting the necessary HTML, we will instruct the LLM: “Hey LLM, using this HTML, please populate the information according to the schema provided below.”
+```
+# Define a JSON schema for movie data validation
+schema = {
+    "properties": {
+        "movie_title": {"type": "string"},
+        "stars": {"type": "integer"},
+        "genre": {"type": "array", "items": {"type": "string"}},
+        "runtime": {"type": "string"},
+        "rating": {"type": "string"},
+    },
+    "required": ["movie_title", "stars", "genre", "runtime", "rating"],
+}
+
+def extract_movie_data(content: str, schema: dict):
+    """
+    Extract movie data from content using a specified JSON schema.
+
+    Parameters:
+    - content (str): Text content containing movie data.
+    - schema (dict): JSON schema for validating the movie data.
+
+    Returns:
+    - dict: Extracted movie data.
+    """
+    # Run the extraction chain with the provided schema and content
+    start_time = time.time()
+    extracted_content = create_extraction_chain(schema=schema, llm=llm).run(content)
+    end_time = time.time()
+
+    # Log metadata and output in the Comet project for tracking purposes
+    comet_llm.log_prompt(
+        prompt=str(content),
+        metadata= {
+            "schema": schema
+        },
+        output= extracted_content,
+        duration= end_time - start_time,
+    )
+
+    return extracted_content
+```
+And finally, we’ve got the result:
+```
+# Extract movie data using the defined schema and the first split page content
+extracted_content = extract_movie_data(schema=schema, content=splits[0].page_content)
+
+# Display the extracted movie data
+extracted_content
+```
